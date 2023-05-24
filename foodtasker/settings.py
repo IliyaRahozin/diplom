@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'coreapp',
     'cloudinary',
     'whitenoise.runserver_nostatic',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +71,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -150,11 +156,33 @@ cloudinary.config(
     api_secret = "jkVe1AF-ZuNbKkbNrzOWV53BXhI"
 )
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
+# Facebook configuration
+SOCIAL_AUTH_FACEBOOK_KEY = '1513781982873290'
+SOCIAL_AUTH_FACEBOOK_SECRET = '25192da5b866efa78d08ca5686a66bbf'
 
-# Configure Django app for Heroku
-#import django_heroku
-#django_heroku.settings(locals())
+# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from Facebook.
+# Email is not sent by default, to get it, you must request the email permission.
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email, picture.type(large)'
+}
 
-#import railway
-#railway.load()
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'coreapp.social_auth_pipeline.create_user_by_type',  # <--- set the path to the function
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+STRIPE_API_KEY = 'sk_test_51NBLc7Et4gstbEnxORmbRMKWzDjp22RMuV6PvgrtK6AQ1BYvmC9bTdr01m13QCLphw3WBradudsrJPz50YEbyv3g00HnkpICz5'
